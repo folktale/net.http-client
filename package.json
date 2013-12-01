@@ -1,6 +1,6 @@
 {
   "name": "net.http-client",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Monadic HTTP client library.",
   "main": "lib/index.js",
   "scripts": {
@@ -20,7 +20,9 @@
   "bugs": {
     "url": "https://github.com/folktale/net.http-client/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "monads.future": "~0.1.0"
+  },
   "devDependencies": {
     "browserify": "git://github.com/killdream/node-browserify",
     "groc": "git://github.com/killdream/groc#patch-livescript",
