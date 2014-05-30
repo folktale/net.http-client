@@ -25,7 +25,7 @@
 
 
 # # Dependencies
-Future = require 'monads.future'
+Future = require 'data.future'
 
 
 make-xhr =
