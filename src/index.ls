@@ -60,7 +60,7 @@ export request = (method, uri, original-headers, body) -->
     headers = original-headers.add 'X-Requested-With', 'XMLHttpRequest'
     client  = make-xhr!
     
-    client.on-ready-state-change = ->
+    client.onreadystatechange = ->
       | is-success client => resolve client.response-text
       | otherwise         => reject (new HttpError client.response-text, client.status)
     
