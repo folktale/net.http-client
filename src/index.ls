@@ -47,8 +47,8 @@ export class HttpError extends Error
 export class Headers
   ->
     @values = {}
-  from-object = (a) -> new Headers <<< { values: ^^a }
-  from-headers = (a) -> new Headers <<< { values: ^^a.values }
+  @from-object = (a) -> new Headers <<< { values: ^^a }
+  @from-headers = (a) -> new Headers <<< { values: ^^a.values }
   add: (key, value) -> new Headers <<< { values: ^^@values <<< { "#key": value }}
   remove: (key) -> @values = {[k,v] for k,v of @values when k isnt key}
   reduce-right: (f,z) -> for k,x of @values => z := f {name:k,value:x}, z
