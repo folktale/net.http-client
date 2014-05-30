@@ -33,7 +33,7 @@ make-xhr =
   | otherwise                  => -> new ActiveXObject 'Microsoft.XMLHTTP'
 
 
-is-success = (http) -> (http.ready-state is 4) and (/2\d\d/.test http.status)
+is-success = (http) -> /2\d\d/.test http.status
 
 
 export class HttpError extends Error
@@ -60,7 +60,7 @@ export request = (method, uri, original-headers, body) -->
     headers = original-headers.add 'X-Requested-With', 'XMLHttpRequest'
     client  = make-xhr!
     
-    client.onreadystatechange = ->
+    client.onreadystatechange = -> if client.ready-state is 4 => switch
       | is-success client => resolve client.response-text
       | otherwise         => reject (new HttpError client.response-text, client.status)
     
