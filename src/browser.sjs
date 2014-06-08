@@ -40,7 +40,7 @@ var extend = require('xtend')
  */
 function makeXhr() {
   return 'XMLHttpRequest' in window?  λ(_) -> new XMLHttpRequest()
-  :      /* otherwise */              λ(_) -> new ActiveXObject 'Microsoft.XMLHTTP'
+  :      /* otherwise */              λ(_) -> new ActiveXObject('Microsoft.XMLHTTP')
 }
 
 /**
