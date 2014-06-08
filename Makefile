@@ -65,7 +65,7 @@ clean-docs:
 clean:
 	rm -rf dist build
 
-test: $(TEST_TGT)
+test: $(TEST_TGT) $(TGT)
 	node test/run.js
 
 package: documentation bundle minify
@@ -78,7 +78,7 @@ package: documentation bundle minify
 	cp LICENCE dist/$(PACKAGE)-$(VERSION)
 	cd dist && tar -czf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
 
-publish: clean $(TGT)
+publish: clean all test
 	npm install
 	npm publish
 
