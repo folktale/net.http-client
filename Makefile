@@ -1,50 +1,79 @@
 bin        = $(shell npm bin)
-lsc        = $(bin)/lsc
+sjs        = $(bin)/sjs
 browserify = $(bin)/browserify
-groc       = $(bin)/groc
+jsdoc      = $(bin)/jsdoc
 uglify     = $(bin)/uglifyjs
 VERSION    = $(shell node -e 'console.log(require("./package.json").version)')
 
+# -- Configuration -----------------------------------------------------
+PACKGE   = NAME
+EXPORTS  = EXPORTS
 
-lib: src/*.ls
-	$(lsc) -o lib -c src/*.ls
+LIB_DIR  = lib
+SRC_DIR  = src
+SRC      = $(wildcard $(SRC_DIR)/*.sjs)
+TGT      = ${SRC:$(SRC_DIR)/%.sjs=$(LIB_DIR)/%.js}
 
+TEST_DIR = test/specs-src
+TEST_BLD = test/specs
+TEST_SRC = $(wildcard $(TEST_DIR)/*.sjs)
+TEST_TGT = ${TEST_SRC:$(TEST_DIR)/%.sjs=$(TEST_BLD)/%.js}
+
+
+# -- Compilation -------------------------------------------------------
 dist:
-	mkdir -p dist
+	mkdir -p $@
 
-dist/net.http-client.umd.js: compile dist
-	$(browserify) lib/index.js --standalone folktale.net.httpClient > $@
+dist/$(PACKAGE).umd.js: $(LIB_DIR)/index.js dist
+	$(browserify) $< --standalone $(EXPORTS) > $@
 
-dist/net.http-client.umd.min.js: dist/net.http-client.umd.js
-	$(uglify) --mangle - < $^ > $@
+dist/$(PACKAGE).umd.min.js: dist/$(PACKAGE).umd.js
+	$(uglify) --mangle - < $< > $@
 
-# ----------------------------------------------------------------------
-bundle: dist/net.http-client.umd.js
+$(LIB_DIR)/%.js: $(SRC_DIR)/%.sjs
+	mkdir -p $(dir $@)
+	$(sjs) --readable-names \
+	       --sourcemap      \
+	       --output $@      \
+	       $<
 
-minify: dist/net.http-client.umd.min.js
+$(TEST_BLD)/%.js: $(TEST_DIR)/%.sjs
+	mkdir -p $(dir $@)
+	$(sjs) --readable-names        \
+	       --module alright/macros \
+	       --output $@             \
+	       $<
 
-compile: lib
+
+# -- Tasks -------------------------------------------------------------
+all: $(TGT)
+
+bundle: dist/$(PACKAGE).umd.js
+
+minify: dist/$(PACKAGE).umd.min.js
 
 documentation:
-	$(groc) --index "README.md"                                              \
-	        --out "docs/literate"                                            \
-	        src/*.ls test/*.ls test/specs/**.ls README.md
+	$(jsdoc) --configure jsdoc.conf.json
+	ABSPATH=$(shell cd "$(dirname "$0")"; pwd) $(MAKE) clean-docs
+
+clean-docs:
+	perl -pi -e "s?$$ABSPATH/??g" ./docs/*.html
 
 clean:
-	rm -rf dist build lib
+	rm -rf dist build
 
-test:
-	$(lsc) test/tap.ls
+test: $(TEST_TGT)
+	node test/tap
 
-package: compile documentation bundle minify
-	mkdir -p dist/net.http-client-$(VERSION)
-	cp -r docs/literate dist/net.http-client-$(VERSION)/docs
-	cp -r lib dist/net.http-client-$(VERSION)
-	cp dist/*.js dist/net.http-client-$(VERSION)
-	cp package.json dist/net.http-client-$(VERSION)
-	cp README.md dist/net.http-client-$(VERSION)
-	cp LICENCE dist/net.http-client-$(VERSION)
-	cd dist && tar -czf net.http-client-$(VERSION).tar.gz net.http-client-$(VERSION)
+package: documentation bundle minify
+	mkdir -p dist/$(PACKAGE)-$(VERSION)
+	cp -r docs dist/$(PACKAGE)-$(VERSION)
+	cp -r lib dist/$(PACKAGE)-$(VERSION)
+	cp dist/*.js dist/$(PACKAGE)-$(VERSION)
+	cp package.json dist/$(PACKAGE)-$(VERSION)
+	cp README.md dist/$(PACKAGE)-$(VERSION)
+	cp LICENCE dist/$(PACKAGE)-$(VERSION)
+	cd dist && tar -czf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
 
 publish: clean
 	npm install
@@ -59,5 +88,4 @@ bump-feature:
 bump-major:
 	VERSION_BUMP=MAJOR $(MAKE) bump
 
-
-.PHONY: test
+.PHONY: test bump bump-feature bump-major publish package clean documentation
