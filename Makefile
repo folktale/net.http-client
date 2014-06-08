@@ -32,16 +32,19 @@ dist/$(PACKAGE).umd.min.js: dist/$(PACKAGE).umd.js
 
 $(LIB_DIR)/%.js: $(SRC_DIR)/%.sjs
 	mkdir -p $(dir $@)
-	$(sjs) --readable-names \
-	       --sourcemap      \
-	       --output $@      \
+	$(sjs) --readable-names            \
+	       --module lambda-chop/macros \
+	       --sourcemap                 \
+	       --output $@                 \
 	       $<
 
 $(TEST_BLD)/%.js: $(TEST_DIR)/%.sjs
 	mkdir -p $(dir $@)
-	$(sjs) --readable-names        \
-	       --module alright/macros \
-	       --output $@             \
+	$(sjs) --readable-names               \
+	       --module hifive/macros         \
+	       --module alright/macros        \
+	       --module alright/macros/future \
+	       --output $@                    \
 	       $<
 
 
@@ -63,7 +66,7 @@ clean:
 	rm -rf dist build
 
 test: $(TEST_TGT)
-	node test/tap
+	node test/run.js
 
 package: documentation bundle minify
 	mkdir -p dist/$(PACKAGE)-$(VERSION)
