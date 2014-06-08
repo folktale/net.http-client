@@ -40,11 +40,11 @@ $(LIB_DIR)/%.js: $(SRC_DIR)/%.sjs
 
 $(TEST_BLD)/%.js: $(TEST_DIR)/%.sjs
 	mkdir -p $(dir $@)
-	$(sjs) --readable-names               \
-	       --module hifive/macros         \
-	       --module alright/macros        \
-	       --module alright/macros/future \
-	       --output $@                    \
+	$(sjs) --readable-names                \
+	       --module hifive/macros          \
+	       --module alright/macros         \
+	       --module alright/macros/futures \
+	       --output $@                     \
 	       $<
 
 
@@ -78,7 +78,7 @@ package: documentation bundle minify
 	cp LICENCE dist/$(PACKAGE)-$(VERSION)
 	cd dist && tar -czf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
 
-publish: clean
+publish: clean $(TGT)
 	npm install
 	npm publish
 
