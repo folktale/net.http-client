@@ -82,7 +82,7 @@ function request(method, options, uri) { return new Future(function(reject, reso
   client.onreadystatechange = function() {
     if (client.readyState === 4) {
       if (isSuccess(client))  resolve({ body: client.responseText, response: client })
-      : /* otherwise */       reject(new HttpError(client)) }};
+      else                    reject(new HttpError(client)) }};
 
   client.open(method.toUpperCase(), uri.toString(), true);
   each(headers, client.setRequestHeader.bind(client));
