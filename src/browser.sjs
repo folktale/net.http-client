@@ -29,7 +29,7 @@
 var Future = require('data.future')
 var curry  = require('core.lambda').curry
 var extend = require('xtend')
-
+var flaw   = require('flaw')
 
 // -- Helpers ----------------------------------------------------------
 
@@ -46,10 +46,8 @@ function makeXhr() {
 /**
  * Verifies if a response is a success.
  *
- * @method
  * @summary XMLHttpRequest → Boolean
  */
-exports.isSuccess = isSuccess
 function isSuccess(http) {
   return /2\d\d/.test(http.status.toString())
 }
@@ -57,16 +55,25 @@ function isSuccess(http) {
 /**
  * Invokes a function for each key/value pair in an object.
  *
- * @method
  * @summary Object, (String, a → Void) → Void
  */
-exports.each = each
 function each(o, f) {
   Object.keys(o).forEach(function(k) {
     f(k, o[k])
   })
 }
 
+/**
+ * Constructs an HTTP Request error.
+ *
+ * 
+ * @summary Response → Error
+ */
+function httpError(response) {
+  return flaw( 'HttpError'
+             , 'HTTP request failed with status ' + response.status
+             , { data: response, status: response.status })
+}
 
 // -- Core implementation ----------------------------------------------
 
@@ -82,7 +89,7 @@ function request(method, options, uri) { return new Future(function(reject, reso
   client.onreadystatechange = function() {
     if (client.readyState === 4) {
       if (isSuccess(client))  resolve({ body: client.responseText, response: client })
-      else                    reject(new HttpError(client)) }};
+      else                    reject(httpError(client)) }};
 
   client.open(method.toUpperCase(), uri.toString(), true);
   each(headers, client.setRequestHeader.bind(client));

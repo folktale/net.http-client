@@ -23,6 +23,7 @@
   "dependencies": {
     "core.lambda": "^1.0.0",
     "data.future": "^2.1.1",
+    "flaw": "^0.1.0",
     "request": "^2.36.0",
     "xtend": "^3.0.0"
   },
