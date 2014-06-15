@@ -29,6 +29,7 @@
 var Future = require('data.future')
 var req    = require('request')
 var extend = require('xtend/mutable')
+var curry  = require('core.lambda').curry
 
 
 // -- Helpers ----------------------------------------------------------
